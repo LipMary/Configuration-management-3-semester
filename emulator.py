@@ -1,10 +1,10 @@
 import sys
 import os
-import csv  # Подключаем модуль для работы с CSV-таблицами
+import csv  # Подключение модуля для работы с CSV-таблицами
 
-# Глобальные переменные для хранения состояния нашей виртуальной системы
-vfs_tree = {}      # Словарь, который будет хранить дерево папок в памяти
-current_dir = "/"  # Строка, в которой хранится папка, где сейчас «находится» пользователь
+# Главные переменные для хранения состояния виртуальной системы
+vfs_tree = {}      # Словарь, будет хранить дерево папок в памяти
+current_dir = "/"  # Строка, где хранится папка, где сейчас «находится» пользователь
 
 def load_vfs(csv_path):
     """Функция для считывания CSV-файла и построения дерева папок в оперативной памяти."""
@@ -21,10 +21,10 @@ def load_vfs(csv_path):
             path = row["path"].strip()
             name = row["name"].strip()
             
-            # Если папки еще нет в нашем дереве, создаем для неё пустой список элементов
+            # Для папки, котопрой нет создаем пустой список элементов
             if path not in vfs_tree:
                 vfs_tree[path] = []
-            # Добавляем файл или подпапку в список этой папки
+            # Добавляем файл-подпапку в список этой папки
             vfs_tree[path].append(name)
 
 def execute_command(user_input, vfs_name):
@@ -39,29 +39,29 @@ def execute_command(user_input, vfs_name):
     command = input_parts[0]
     arguments = input_parts[1:]
     
-    # --- КОМАНДА EXIT ---
+    # КОМАНДА EXIT
     if command == "exit":
         print("Выход из эмулятора.")
         return False
         
-    # --- КОМАНДА LS (Настоящая реализация) ---
+    # КОМАНДА LS (Настоящая реализация)
     elif command == "ls":
-        # Проверяем, есть ли текущая директория в нашем виртуальном дереве
+        # Проверка, есть ли текущая директория в виртуальном дереве
         if current_dir in vfs_tree:
-            # Склеиваем все элементы папки через два пробела и выводим на экран
+            # Склеиваю все элементы папки через два пробела и выводятся на экран
             print("  ".join(vfs_tree[current_dir]))
         else:
             # Если папка пустая или в ней ничего нет
             print("")
             
-    # --- КОМАНДА CD (Настоящая реализация) ---
+    # КОМАНДА CD (Настоящая реализация)
     elif command == "cd":
-        # Если аргументов нет, по правилам Linux возвращаемся в корень "/"
+        # Если аргументов нет, возвращаемся в корень "/" (по правилам Linux)
         if not arguments:
             current_dir = "/"
             return True
             
-        target = arguments[0] # Берем имя папки, куда хотим перейти
+        target = arguments[0] # Имя папки, куда нужно перейти
         
         # Переход в корень
         if target == "/":
@@ -73,13 +73,13 @@ def execute_command(user_input, vfs_name):
                 if not current_dir:
                     current_dir = "/"
         else:
-            # Формируем предполагаемый новый путь
+            # Формируется предполагаемый новый путь
             if current_dir == "/":
                 potential_dir = f"/{target}"
             else:
                 potential_dir = f"{current_dir}/{target}"
                 
-            # Проверяем, существует ли такая подпапка в нашей системе
+            # Проверяка, существует ли такая подпапка в системе
             if potential_dir in vfs_tree or (current_dir in vfs_tree and target in vfs_tree[current_dir]):
                 current_dir = potential_dir
             else:
@@ -100,7 +100,7 @@ def main():
     script_path = sys.argv[2]
     vfs_name = os.path.basename(vfs_path)
 
-    # Загружаем структуру папок из нашей созданной таблицы vfs.csv
+    # Загрузка структуры папок из созданной таблицы vfs.csv
     load_vfs(vfs_path)
 
     print(f"Эмулятор запущен. Настройки:")
@@ -113,7 +113,7 @@ def main():
         with open(script_path, "r", encoding="utf-8") as f:
             for line in f.readlines():
                 clean_line = line.rstrip("\n")
-                # Теперь промпт показывает реальную текущую папку: vfs.csv:/папка>
+                # Реальная текущая папка: vfs.csv:/папка>
                 print(f"{vfs_name}:{current_dir}> {clean_line}")
                 if not execute_command(clean_line, vfs_name):
                     return
