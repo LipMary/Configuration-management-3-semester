@@ -1,0 +1,7 @@
+path,name
+/,home
+/,etc
+/home,user
+/home/user,documents
+/home/user,photo.png
+/etc,config.txt
